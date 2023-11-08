@@ -1,5 +1,4 @@
 #include <memory>
-#include <iostream>
 //-----------------------------------------------------------------------------
 template<typename T, size_t N = 10, typename Alloc = std::allocator<T>>
 class CustomAllocator
@@ -12,85 +11,85 @@ public:
     using size_type = size_t;
 
     explicit CustomAllocator()
-        : begin(nullptr),
-        end(nullptr),
-        stack_pointer(nullptr)
+        : m_Begin(nullptr),
+        m_End(nullptr),
+        m_StackPointer(nullptr)
     {
 
     }
 
     explicit CustomAllocator(pointer buffer)
-        : begin(buffer),
-        end(buffer + N),
-        stack_pointer(buffer)
+        : m_Begin(buffer),
+        m_End(buffer + N),
+        m_StackPointer(buffer)
     {
 
     }
 
     CustomAllocator(const CustomAllocator& other)
-        : allocator(other.allocator),
-        begin(other.begin),
-        end(other.end),
-        stack_pointer(other.stack_pointer)
+        : m_Allocator(other.m_Allocator),
+        m_Begin(other.m_Begin),
+        m_End(other.m_End),
+        m_StackPointer(other.m_StackPointer)
     {
 
     }
 
     template<typename U>
     CustomAllocator(const CustomAllocator<U, N>& other)
-        : allocator(other.allocator),
-        begin(other.begin),
-        end(other.end),
-        stack_pointer(other.stack_pointer)
+        : m_Allocator(other.m_Allocator),
+        m_Begin(other.m_Begin),
+        m_End(other.m_End),
+        m_StackPointer(other.m_StackPointer)
     {
 
     }
 
     pointer allocate(size_type n, const_void_pointer hint = const_void_pointer())
     {
-        if (begin == nullptr)
+        if (m_Begin == nullptr)
         {
             init();
         }
 
-        if (n <= size_type(std::distance(stack_pointer, end)))
+        if (n <= size_type(std::distance(m_StackPointer, m_End)))
         {
-            pointer result = stack_pointer;
-            stack_pointer += n;
+            pointer result = m_StackPointer;
+            m_StackPointer += n;
             return result;
         }
 
-        return allocator.allocate(n, hint);
+        return m_Allocator.allocate(n, hint);
     }
 
     void deallocate(pointer p, size_type n)
     {
         if (owns(p))
         {
-            stack_pointer -= n;
+            m_StackPointer -= n;
         }
     }
 
     template<typename U, typename... Args>
     void construct(U* p, Args &&... args)
     {
-        allocator.construct(p, std::forward<Args>(args)...);
+        m_Allocator.construct(p, std::forward<Args>(args)...);
     }
 
     template<typename U>
     void destroy(U* p)
     {
-        allocator.destroy(p);
+        m_Allocator.destroy(p);
     }
 
     bool owns(const_pointer p)
     {
-        return (!(std::less<const_pointer>()(p, begin)) && (std::less<const_pointer>()(p, end)));
+        return (!(std::less<const_pointer>()(p, m_Begin)) && (std::less<const_pointer>()(p, m_End)));
     }
 
     pointer buffer() const noexcept
     {
-        return begin;
+        return m_Begin;
     }
 
     template <class U>
@@ -100,16 +99,16 @@ public:
     };
 
 private:
-    pointer begin;
-    pointer end;
-    pointer stack_pointer;
-    Alloc allocator;
+    pointer m_Begin;
+    pointer m_End;
+    pointer m_StackPointer;
+    Alloc m_Allocator;
 
     void init()
     {
-        begin = reinterpret_cast<T*>(operator new (N * sizeof(T)));
-        end = begin + N;
-        stack_pointer = begin;
+        m_Begin = reinterpret_cast<T*>(operator new (N * sizeof(T)));
+        m_End = m_Begin + N;
+        m_StackPointer = m_Begin;
     }
 };
 //-----------------------------------------------------------------------------

@@ -15,16 +15,16 @@ public:
     using allocator_type = Alloc;
 
     CustomList()
-        : head(nullptr),
-        tail(nullptr)
+        : m_Head(nullptr),
+        m_Tail(nullptr)
     {
 
     }
 
     CustomList(const allocator_type& a)
-        : head(nullptr),
-        tail(nullptr),
-        allocator(a)
+        : m_Head(nullptr),
+        m_Tail(nullptr),
+        m_Allocator(a)
     {
 
     }
@@ -36,83 +36,83 @@ public:
         n->value = value;
         n->next = nullptr;
 
-        if (head == nullptr)
+        if (m_Head == nullptr)
         {
-            head = n;
-            tail = n;
+            m_Head = n;
+            m_Tail = n;
         }
         else
         {
-            tail->next = n;
-            tail = tail->next;
+            m_Tail->next = n;
+            m_Tail = m_Tail->next;
         }
     }
 
     T& front() const
     {
-        return head->value;
+        return m_Head->value;
     }
 
     T& back()
     {
-        return tail->value;
+        return m_Tail->value;
     }
 
     class iterator
     {
     public:
         iterator() noexcept
-            : current(nullptr)
+            : m_Current(nullptr)
         {
 
         }
 
         iterator(const ListNode* ptr) noexcept
-            : current(ptr)
+            : m_Current(ptr)
         {
 
         }
 
         iterator& operator=(ListNode* ptr)
         {
-            current = ptr;
+            m_Current = ptr;
             return *this;
         }
 
         iterator& operator++()
         {
-            if (current)
-                current = current->next;
+            if (m_Current)
+                m_Current = m_Current->next;
             return *this;
         }
 
         bool operator==(const iterator& it)
         {
-            return current == it.current;
+            return m_Current == it.m_Current;
         }
 
         bool operator!=(const iterator& it)
         {
-            return current != it.current;
+            return m_Current != it.m_Current;
         }
 
         T operator*() const
         {
-            return current->value;
+            return m_Current->value;
         }
 
     private:
-        const ListNode* current;
+        const ListNode* m_Current;
     };
 
     iterator begin()
     {
-        return iterator(head);
+        return iterator(m_Head);
     }
 
     iterator begin() const
     {
-        return iterator(head);
+        return iterator(m_Head);
     }
 
     iterator end()
@@ -126,8 +126,8 @@ public:
     }
 
 private:
-    ListNode* head;
-    ListNode* tail;
-    Alloc allocator;
+    ListNode* m_Head;
+    ListNode* m_Tail;
+    Alloc m_Allocator;
 };
 //-----------------------------------------------------------------------------
