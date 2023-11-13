@@ -1,4 +1,5 @@
 #include <memory>
+#include <stdexcept>
 //-----------------------------------------------------------------------------
 template<typename T, size_t N = 10, typename Alloc = std::allocator<T>>
 class CustomAllocator
@@ -59,7 +60,15 @@ public:
             return result;
         }
 
-        return m_Allocator.allocate(n, hint);
+        try
+        {
+            return m_Allocator.allocate(n, hint);
+        }
+        catch (const std::bad_alloc& e)
+        {
+            throw std::runtime_error(e.what());
+        }
+        return pointer();
     }
 
     void deallocate(pointer p, size_type n)
