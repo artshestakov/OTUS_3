@@ -1,6 +1,7 @@
 #define _SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING //Для использования if constexpr
 //-----------------------------------------------------------------------------
 #include <map>
+#include <vector>
 #include "utils.h"
 //-----------------------------------------------------------------------------
 int main()
@@ -13,11 +14,8 @@ int main()
 
     // 2. std::map с кастомным аллокатором
     {
-        //Я вообще не понимаю почему код ниже вызывает ошибки...
-        //При чем такое только с std::map...
-
-        /*std::map<int, int, std::less<int>, stack_allocator<int>> m;
-        Fill(m);*/
+        std::map<int, int, std::less<int>, CustomAllocator<std::pair<const int, int>>> m;
+        Fill(m);
     }
 
     // 3. Кастомный контейнер
@@ -30,6 +28,12 @@ int main()
     {
         CustomList<int, CustomAllocator<int>> l;
         Fill(l);
+    }
+
+    // 5. Стандартный контейнер с кастомным аллокатором
+    {
+        std::vector<int, CustomAllocator<int>> v;
+        Fill(v);
     }
 
     return 0;

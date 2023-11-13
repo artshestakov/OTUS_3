@@ -1,17 +1,27 @@
 #include <memory>
 #include <stdexcept>
 //-----------------------------------------------------------------------------
-template<typename T, size_t N = 10, typename Alloc = std::allocator<T>>
-class CustomAllocator
+template<typename T>
+struct pointer_traits
+{
+    using reference = T&;
+    using const_reference = const T&;
+};
+//-----------------------------------------------------------------------------
+template<>
+struct pointer_traits<void> { };
+//-----------------------------------------------------------------------------
+template<typename T = void, size_t N = 10>
+struct CustomAllocator : public pointer_traits<T>
 {
 public:
-    using value_type = typename std::allocator_traits<Alloc>::value_type;
-    using pointer = typename std::allocator_traits<Alloc>::pointer;
-    using const_pointer = typename std::allocator_traits<Alloc>::const_pointer;
-    using const_void_pointer = typename std::allocator_traits<Alloc>::const_void_pointer;
-    using size_type = size_t;
+    using value_type = T;
+    using size_type = std::size_t;
+    using pointer = value_type*;
+    using const_pointer = const value_type*;
+    using difference_type = typename std::pointer_traits<pointer>::difference_type;
 
-    explicit CustomAllocator()
+    CustomAllocator() noexcept
         : m_Begin(nullptr),
         m_End(nullptr),
         m_StackPointer(nullptr)
@@ -19,34 +29,21 @@ public:
 
     }
 
-    explicit CustomAllocator(pointer buffer)
-        : m_Begin(buffer),
-        m_End(buffer + N),
-        m_StackPointer(buffer)
-    {
-
-    }
-
-    CustomAllocator(const CustomAllocator& other)
-        : m_Allocator(other.m_Allocator),
-        m_Begin(other.m_Begin),
-        m_End(other.m_End),
-        m_StackPointer(other.m_StackPointer)
+    ~CustomAllocator() noexcept
     {
 
     }
 
     template<typename U>
-    CustomAllocator(const CustomAllocator<U, N>& other)
-        : m_Allocator(other.m_Allocator),
-        m_Begin(other.m_Begin),
-        m_End(other.m_End),
-        m_StackPointer(other.m_StackPointer)
+    CustomAllocator(const CustomAllocator<U>&) noexcept
+        : m_Begin(nullptr),
+        m_End(nullptr),
+        m_StackPointer(nullptr)
     {
 
     }
 
-    pointer allocate(size_type n, const_void_pointer hint = const_void_pointer())
+    pointer allocate(size_type n, const void* = 0)
     {
         if (m_Begin == nullptr)
         {
@@ -62,7 +59,7 @@ public:
 
         try
         {
-            return m_Allocator.allocate(n, hint);
+            return allocate(n);
         }
         catch (const std::bad_alloc& e)
         {
@@ -79,18 +76,6 @@ public:
         }
     }
 
-    template<typename U, typename... Args>
-    void construct(U* p, Args &&... args)
-    {
-        m_Allocator.construct(p, std::forward<Args>(args)...);
-    }
-
-    template<typename U>
-    void destroy(U* p)
-    {
-        m_Allocator.destroy(p);
-    }
-
     bool owns(const_pointer p)
     {
         return (!(std::less<const_pointer>()(p, m_Begin)) && (std::less<const_pointer>()(p, m_End)));
@@ -101,34 +86,33 @@ public:
         return m_Begin;
     }
 
-    template <class U>
+    template<typename U>
     struct rebind
     {
-        using other = CustomAllocator<U, N>;
+        using other = CustomAllocator<U>;
     };
 
 private:
     pointer m_Begin;
     pointer m_End;
-    pointer m_StackPointer;
-    Alloc m_Allocator;
 
+    pointer m_StackPointer;
     void init()
     {
-        m_Begin = reinterpret_cast<T*>(operator new (N * sizeof(T)));
+        m_Begin = reinterpret_cast<pointer>(operator new (N * sizeof(value_type)));
         m_End = m_Begin + N;
         m_StackPointer = m_Begin;
     }
 };
 //-----------------------------------------------------------------------------
 template <typename T1, std::size_t N, typename T2>
-bool operator == (const CustomAllocator<T1, N>& lhs, const CustomAllocator<T2, N>& rhs) noexcept
+bool operator==(const CustomAllocator<T1, N>& lhs, const CustomAllocator<T2, N>& rhs) noexcept
 {
     return lhs.buffer() == rhs.buffer();
 }
 //-----------------------------------------------------------------------------
 template <typename T1, std::size_t N, typename T2>
-bool operator != (const CustomAllocator<T1, N>& lhs, const CustomAllocator<T2, N>& rhs) noexcept
+bool operator!=(const CustomAllocator<T1, N>& lhs, const CustomAllocator<T2, N>& rhs) noexcept
 {
     return !(lhs == rhs);
 }

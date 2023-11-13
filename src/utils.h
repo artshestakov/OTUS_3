@@ -18,7 +18,8 @@ template <typename T> struct type_false : std::false_type {};
 template<typename T>
 void Fill(T& t)
 {
-    if constexpr (std::is_same_v<std::map<int, int>, T>)
+    if constexpr (std::is_same_v<std::map<int, int>, T> ||
+                  std::is_same_v< std::map<int, int, std::less<int>, CustomAllocator<std::pair<const int, int>>>, T>)
     {
         for (unsigned int i = 0; i < 10; ++i)
         {
@@ -30,6 +31,13 @@ void Fill(T& t)
         for (unsigned int i = 0; i < 10; ++i)
         {
             t.push_front(i);
+        }
+    }
+    else if constexpr (std::is_same_v<std::vector<int, CustomAllocator<int>>, T>)
+    {
+        for (unsigned int i = 0; i < 10; ++i)
+        {
+            t.emplace_back(i);
         }
     }
     else //Не поддерживаем такой тип
