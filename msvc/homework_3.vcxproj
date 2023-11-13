@@ -19,12 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.cpp" />
+    <ClInclude Include="..\src\custom_allocator.h" />
+    <ClInclude Include="..\src\custom_list.h" />
+    <ClInclude Include="..\src\utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\custom_list.h" />
-    <ClInclude Include="src\custom_allocator.h" />
-    <ClInclude Include="src\utils.h" />
+    <ClCompile Include="..\src\main.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -80,23 +80,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)Bin\$(Configuration)-$(Platform)\</OutDir>
-    <IntDir>$(SolutionDir)Build\$(Configuration)-$(Platform)\</IntDir>
+    <OutDir>$(SolutionDir)..\Bin\$(Configuration)-$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)..\Build\$(Configuration)-$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)Bin\$(Configuration)-$(Platform)\</OutDir>
-    <IntDir>$(SolutionDir)Build\$(Configuration)-$(Platform)\</IntDir>
+    <OutDir>$(SolutionDir)..\Bin\$(Configuration)-$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)..\Build\$(Configuration)-$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)Bin\$(Configuration)-$(Platform)\</OutDir>
-    <IntDir>$(SolutionDir)Build\$(Configuration)-$(Platform)\</IntDir>
+    <OutDir>$(SolutionDir)..\Bin\$(Configuration)-$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)..\Build\$(Configuration)-$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)Bin\$(Configuration)-$(Platform)\</OutDir>
-    <IntDir>$(SolutionDir)Build\$(Configuration)-$(Platform)\</IntDir>
+    <OutDir>$(SolutionDir)..\Bin\$(Configuration)-$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)..\Build\$(Configuration)-$(Platform)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
